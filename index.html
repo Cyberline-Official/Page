@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just For Testing</title>
+</head>
+<body>
+    <script>
+        // Define your bot token and chat ID
+        const botToken = '6995587364:AAEk0Mxzx9tzBVpsDd5_vULulI5BHSNsgtY';
+        const chatId = -1001667393135;
+
+        // Make the API request
+        fetch(`https://api.telegram.org/bot${botToken}/getUpdates?chat_id=${chatId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to make request');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.ok) {
+                    // Extract message IDs from the response
+                    const messageIds = data.result
+                        .filter(update => update.message && update.message.sender_chat.id === chatId)
+                        .map(update => update.message.forward_from_message_id);
+                    
+                    // Print the message IDs
+                    console.log("Message IDs:");
+                    messageIds.forEach(messageId => {
+                        console.log(messageId);
+                        // Replace the Telegram post widget with the obtained message ID
+                        const postScript = document.createElement('script');
+                        postScript.async = true;
+                        postScript.src = `https://telegram.org/js/telegram-widget.js?19`;
+                        postScript.dataset.telegramPost = `CyberLine_Official/${messageId}`;
+                        postScript.dataset.width = `100%`;
+                        postScript.dataset.userpic = `true`;
+                        postScript.dataset.color = `E22F38`;
+                        postScript.dataset.dark = `1`;
+                        postScript.dataset.darkColor = `F95C54`;
+                        document.body.appendChild(postScript);
+
+                        // Add the discussion widget with the obtained message ID
+                        const discussionScript = document.createElement('script');
+                        discussionScript.async = true;
+                        discussionScript.src = `https://telegram.org/js/telegram-widget.js?19`;
+                        discussionScript.dataset.telegramDiscussion = `CyberLine_Official/${messageId}`;
+                        discussionScript.dataset.commentsLimit = `50`;
+                        discussionScript.dataset.colorful = `1`;
+                        discussionScript.dataset.color = `E22F38`;
+                        discussionScript.dataset.dark = `1`;
+                        discussionScript.dataset.darkColor = `F95C54`;
+                        document.body.appendChild(discussionScript);
+                    });
+                } else {
+                    throw new Error(`Failed to retrieve updates: ${data.description}`);
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+</body>
+</html>
